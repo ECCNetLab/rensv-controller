@@ -1,0 +1,20 @@
+# permissions for end users to view rensvs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: rensv-viewer-role
+rules:
+- apiGroups:
+  - rensv.natlab.ecc.ac.jp
+  resources:
+  - rensvs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - rensv.natlab.ecc.ac.jp
+  resources:
+  - rensvs/status
+  verbs:
+  - get

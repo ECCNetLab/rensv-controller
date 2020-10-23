@@ -1,0 +1,7 @@
+domain: natlab.ecc.ac.jp
+repo: github.com/ECCNetLab/rensv-controller
+resources:
+- group: rensv
+  kind: Rensv
+  version: v1
+version: "2"

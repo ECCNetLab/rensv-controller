@@ -1,0 +1,7 @@
+apiVersion: rensv.natlab.ecc.ac.jp/v1
+kind: Rensv
+metadata:
+  name: rensv-sample
+spec:
+  # Add fields here
+  foo: bar

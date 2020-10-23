@@ -1,0 +1,24 @@
+# permissions for end users to edit rensvs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: rensv-editor-role
+rules:
+- apiGroups:
+  - rensv.natlab.ecc.ac.jp
+  resources:
+  - rensvs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rensv.natlab.ecc.ac.jp
+  resources:
+  - rensvs/status
+  verbs:
+  - get
