@@ -1,0 +1,10 @@
+<VirtualHost *:80>
+    DocumentRoot /var/www/html/dummy
+    Redirect 404 /
+</VirtualHost>
+{{ range $i,$user := . }}
+<VirtualHost *:80>
+    DocumentRoot {{ $user.Spec.DocumentRoot }}
+    ServerName {{ $user.Spec.ServerName }}
+</VirtualHost>
+{{ end }}
