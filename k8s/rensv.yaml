@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rensv
+  labels:
+    app: rensv
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: rensv
+  template:
+    metadata:
+      labels:
+        app: rensv
+    spec:
+      serviceAccountName: rensv-sa
+      containers:
+        - name: rensv
+          image: rensv-controller:v1
+          env:
+            - name: REDIS_SESSION
+              value: "/tmp"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: phpconfig
+              mountPath: /usr/local/etc/php
+      volumes:
+        - name: phpconfig
+          configMap:
+            name: phpconfig
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rensv
+spec:
+  type: NodePort
+  selector:
+    app: rensv
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080

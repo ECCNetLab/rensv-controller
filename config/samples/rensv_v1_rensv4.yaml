@@ -1,0 +1,7 @@
+apiVersion: rensv.natlab.ecc.ac.jp/v1
+kind: Rensv
+metadata:
+  name: rensv4
+spec:
+  documentRoot: /var/www/html/aaa
+  serverName: aaa.netlab.ecc.ac.jp

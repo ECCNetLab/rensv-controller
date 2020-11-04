@@ -29,7 +29,8 @@ type RensvSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// Foo is an example field of Rensv. Edit Rensv_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	DocumentRoot string `json:"documentRoot"`
+	ServerName   string `json:"serverName"`
 }
 
 // RensvStatus defines the observed state of Rensv

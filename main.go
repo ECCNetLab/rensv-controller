@@ -19,6 +19,7 @@ package main
 import (
 	"flag"
 	"os"
+	"os/exec"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -51,6 +52,13 @@ func main() {
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 	flag.Parse()
+
+	// apache2 start
+	err := exec.Command("/usr/sbin/apache2ctl", "-D", "FOREGROUND").Start()
+	if err != nil {
+		setupLog.Error(err, "apache2 working error")
+		os.Exit(1)
+	}
 
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
 
