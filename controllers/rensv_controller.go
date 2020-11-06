@@ -19,9 +19,9 @@ package controllers
 import (
 	"context"
 	"html/template"
-	"log"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -52,22 +52,35 @@ func (r *RensvReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	t, err := template.New("vhosts.tmpl").ParseFiles("/template/vhosts.tmpl")
 	if err != nil {
-		log.Fatal(err)
+		return ctrl.Result{
+			Requeue:      true,
+			RequeueAfter: time.Second * 5,
+		}, err
 	}
 	file, err := os.Create("/etc/apache2/conf-enabled/vhosts.conf")
 	if err != nil {
-		log.Fatal(err)
+		return ctrl.Result{
+			Requeue:      true,
+			RequeueAfter: time.Second * 5,
+		}, err
 	}
 	defer file.Close()
 
 	if err := t.Execute(file, list.Items); err != nil {
-		log.Fatal(err)
+		return ctrl.Result{
+			Requeue:      true,
+			RequeueAfter: time.Second * 5,
+		}, err
 	}
 	defer t.Clone()
 
 	// apache2 reload
 	if err := exec.Command("/usr/sbin/apache2ctl", "-k", "graceful").Run(); err != nil {
 		rlog.V(0).Info("error", "apache2 reload", "error")
+		return ctrl.Result{
+			Requeue:      true,
+			RequeueAfter: time.Second * 5,
+		}, err
 	} else {
 		rlog.V(0).Info("debug", "apache2 reload", "success")
 	}
