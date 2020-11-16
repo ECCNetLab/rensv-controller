@@ -18,6 +18,10 @@ package controllers
 
 import (
 	"context"
+	"html/template"
+	"os"
+	"os/exec"
+	"time"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -38,10 +42,48 @@ type RensvReconciler struct {
 // +kubebuilder:rbac:groups=rensv.natlab.ecc.ac.jp,resources=rensvs/status,verbs=get;update;patch
 
 func (r *RensvReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
-	_ = r.Log.WithValues("rensv", req.NamespacedName)
+	ctx := context.Background()
+	rlog := r.Log.WithValues("rensv", req.NamespacedName)
 
-	// your logic here
+	var list rensvv1.RensvList
+	if err := r.List(ctx, &list, &client.ListOptions{}); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	t, err := template.New("vhosts.tmpl").ParseFiles("/template/vhosts.tmpl")
+	if err != nil {
+		return ctrl.Result{
+			Requeue:      true,
+			RequeueAfter: time.Second * 5,
+		}, err
+	}
+	file, err := os.Create("/etc/apache2/conf-enabled/vhosts.conf")
+	if err != nil {
+		return ctrl.Result{
+			Requeue:      true,
+			RequeueAfter: time.Second * 5,
+		}, err
+	}
+	defer file.Close()
+
+	if err := t.Execute(file, list.Items); err != nil {
+		return ctrl.Result{
+			Requeue:      true,
+			RequeueAfter: time.Second * 5,
+		}, err
+	}
+	defer t.Clone()
+
+	// apache2 reload
+	if err := exec.Command("/usr/sbin/apache2ctl", "-k", "graceful").Run(); err != nil {
+		rlog.V(0).Info("error", "apache2 reload", "error")
+		return ctrl.Result{
+			Requeue:      true,
+			RequeueAfter: time.Second * 5,
+		}, err
+	} else {
+		rlog.V(0).Info("debug", "apache2 reload", "success")
+	}
 
 	return ctrl.Result{}, nil
 }

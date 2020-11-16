@@ -1,0 +1,7 @@
+apiVersion: rensv.natlab.ecc.ac.jp/v1
+kind: Rensv
+metadata:
+  name: rensv3
+spec:
+  documentRoot: /var/www/html/piyo
+  serverName: piyo.netlab.ecc.ac.jp

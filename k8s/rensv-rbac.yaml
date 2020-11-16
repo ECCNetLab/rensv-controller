@@ -1,0 +1,27 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: rensv-role
+rules:
+- apiGroups: ["rensv.natlab.ecc.ac.jp"]
+  resources: ["rensvs"]
+  verbs: ["list"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rensv-sa
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: rensv-rb
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rensv-role
+subjects:
+- apiGroup: ""
+  kind: ServiceAccount
+  name: rensv-sa
+  namespace: default

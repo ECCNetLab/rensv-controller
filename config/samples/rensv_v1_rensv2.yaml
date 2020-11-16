@@ -1,0 +1,7 @@
+apiVersion: rensv.natlab.ecc.ac.jp/v1
+kind: Rensv
+metadata:
+  name: rensv2
+spec:
+  documentRoot: /var/www/html/huga
+  serverName: huga.netlab.ecc.ac.jp
