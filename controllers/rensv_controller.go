@@ -21,12 +21,15 @@ import (
 	"html/template"
 	"os"
 	"os/exec"
+	"sync"
 	"time"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	rensvv1 "github.com/ECCNetLab/rensv-controller/api/v1"
 )
@@ -36,6 +39,7 @@ type RensvReconciler struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
+	Locker *sync.RWMutex
 }
 
 // +kubebuilder:rbac:groups=rensv.natlab.ecc.ac.jp,resources=rensvs,verbs=get;list;watch;create;update;patch;delete
@@ -49,6 +53,9 @@ func (r *RensvReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if err := r.List(ctx, &list, &client.ListOptions{}); err != nil {
 		return ctrl.Result{}, err
 	}
+
+	r.Locker.Lock()
+	defer r.Locker.Unlock()
 
 	t, err := template.New("vhosts.tmpl").ParseFiles("/template/vhosts.tmpl")
 	if err != nil {
@@ -89,7 +96,23 @@ func (r *RensvReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 }
 
 func (r *RensvReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	p := predicate.Predicate(predicate.Funcs{
+		CreateFunc: func(e event.CreateEvent) bool {
+			return true
+		},
+		UpdateFunc: func(e event.UpdateEvent) bool {
+			return false
+		},
+		DeleteFunc: func(e event.DeleteEvent) bool {
+			return true
+		},
+		GenericFunc: func(e event.GenericEvent) bool {
+			return false
+		},
+	})
+
 	return ctrl.NewControllerManagedBy(mgr).
+		WithEventFilter(p).
 		For(&rensvv1.Rensv{}).
 		Complete(r)
 }

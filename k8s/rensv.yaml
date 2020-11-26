@@ -17,7 +17,7 @@ spec:
       serviceAccountName: rensv-sa
       containers:
         - name: rensv
-          image: rensv-controller:v1
+          image: fzag.sakuracr.jp/rensv-controller:v0.16
           env:
             - name: REDIS_SESSION
               value: "/tmp"

@@ -20,6 +20,7 @@ import (
 	"flag"
 	"os"
 	"os/exec"
+	"sync"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -78,6 +79,7 @@ func main() {
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Rensv"),
 		Scheme: mgr.GetScheme(),
+		Locker: &sync.RWMutex{},
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Rensv")
 		os.Exit(1)

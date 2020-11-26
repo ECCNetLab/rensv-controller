@@ -5,7 +5,7 @@ metadata:
 rules:
 - apiGroups: ["rensv.natlab.ecc.ac.jp"]
   resources: ["rensvs"]
-  verbs: ["list"]
+  verbs: ["list","watch"]
 ---
 apiVersion: v1
 kind: ServiceAccount
